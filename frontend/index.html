@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coding Assignment Evaluator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Poppins', sans-serif; background: #f7f9fc; margin: 0; padding: 0; }
+.container { max-width: 950px; margin: 50px auto; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); }
+h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+input, button { padding: 12px; margin: 10px 0; width: 100%; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
+button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; }
+button:hover { background-color: #45a049; }
+.feedback { background: #f0f0f0; padding: 20px; border-radius: 6px; margin-top: 20px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>AI Coding Assignment Evaluator</h1>
+
+    <h3>Upload Code File (.py)</h3>
+    <input type="file" id="fileInput">
+    <button onclick="submitFile()">Evaluate File</button>
+
+    <h3>Or Enter GitHub File URL</h3>
+    <input type="text" id="githubUrl" placeholder="https://github.com/user/repo/blob/main/code.py">
+    <button onclick="submitGithub()">Evaluate GitHub File</button>
+
+    <h3>Feedback:</h3>
+    <div class="feedback" id="feedback">Results will appear here...</div>
+</div>
+
+<script>
+async function submitFile() {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return alert("Please select a file.");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("http://127.0.0.1:8000/evaluate", {
+        method: "POST",
+        body: formData
+    });
+    const data = await res.json();
+    document.getElementById("feedback").textContent = data.feedback;
+}
+
+async function submitGithub() {
+    const url = document.getElementById("githubUrl").value.trim();
+    if (!url) return alert("Please enter a GitHub URL.");
+    const res = await fetch("http://127.0.0.1:8000/upload_github", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ github_url: url })
+    });
+    const data = await res.json();
+    document.getElementById("feedback").textContent = data.feedback;
+}
+</script>
+</body>
+</html>
